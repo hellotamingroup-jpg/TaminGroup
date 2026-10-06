@@ -3,8 +3,8 @@
 
   var EMAIL = "hello.tamingroup@gmail.com";
 
-  // Адрес сервиса приёма форм, например "https://formspree.io/f/xxxxxxxx".
-  // Пока строка пустая, форма копирует текст сообщения вместо отправки.
+  // Адрес вашей серверной функции или сервиса форм.
+  // Пока пусто, форма откроет почтовую программу с готовым письмом.
   var FORM_ENDPOINT = "";
 
   var form = document.getElementById("contact-form");
@@ -30,16 +30,19 @@
       return;
     }
 
+    // Режим 1: адрес отправки не задан, открываем почтовую программу.
     if (!FORM_ENDPOINT) {
       var plain = "Имя: " + name + "\nПочта: " + mail + "\n\n" + text;
-      copyText(plain).then(function (ok) {
-        status.textContent = ok
-          ? "Форма пока не подключена. Текст скопирован, отправьте его на " + EMAIL + "."
-          : "Форма пока не подключена. Скопируйте текст вручную и отправьте на " + EMAIL + ".";
-      });
+      copyText(plain);
+      var link = "mailto:" + EMAIL +
+        "?subject=" + encodeURIComponent("Заявка с сайта TAMIN GROUP") +
+        "&body=" + encodeURIComponent(plain);
+      status.textContent = "Открываем почтовую программу. Если ничего не открылось, текст уже скопирован: отправьте его на " + EMAIL + ".";
+      window.location.href = link;
       return;
     }
 
+    // Режим 2: отправка на сервер.
     button.disabled = true;
     status.textContent = "Отправляем…";
     fetch(FORM_ENDPOINT, {
